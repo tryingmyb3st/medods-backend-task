@@ -32,11 +32,10 @@ docker compose down -v && docker compose up --build
 | `custom` | Только на указанные даты | `custom_dates` (массив дат) |
 | `even_odd` | Чётные или нечётные дни месяца | `even_odd` (`"even"` или `"odd"`) |
 
-### Примеры запросов
+### Примеры запросов на POST /api/v1/tasks
 
 **Ежедневная задача (каждый день):**
 ```json
-POST /api/v1/tasks
 {
   "title": "Ежедневный обход пациентов",
   "status": "new",
@@ -119,8 +118,8 @@ POST /api/v1/tasks
 Значение `even_odd` приводится к нижнему регистру на уровне usecase:
 
 ```json
-"even_odd": "Even"   →   "even"
-"even_odd": "ODD"    →   "odd"
+"even_odd": "Even" → "even"
+"even_odd": "ODD"  → "odd"
 ```
 
 ---
