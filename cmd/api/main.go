@@ -11,6 +11,7 @@ import (
 	"time"
 
 	infrastructurepostgres "example.com/taskservice/internal/infrastructure/postgres"
+	"example.com/taskservice/internal/infrastructure/scheduler"
 	postgresrepo "example.com/taskservice/internal/repository/postgres"
 	transporthttp "example.com/taskservice/internal/transport/http"
 	swaggerdocs "example.com/taskservice/internal/transport/http/docs"
@@ -40,6 +41,9 @@ func main() {
 	taskHandler := httphandlers.NewTaskHandler(taskUsecase)
 	docsHandler := swaggerdocs.NewHandler()
 	router := transporthttp.NewRouter(taskHandler, docsHandler)
+
+	scheduler := scheduler.NewPeriodicityScheduler(taskUsecase, logger, 20*time.Minute)
+	scheduler.Start(ctx)
 
 	server := &http.Server{
 		Addr:              cfg.HTTPAddr,

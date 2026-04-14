@@ -14,8 +14,16 @@ services:
       retries: 10
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./migrations/0001_create_tasks.up.sql:/docker-entrypoint-initdb.d/001_create_tasks.sql:ro
+      # - ./migrations/0001_create_tasks.up.sql:/docker-entrypoint-initdb.d/001_create_tasks.sql:ro
 
+  db-migrations:
+    image: migrate/migrate:4
+    volumes:
+      - ./migrations:/migrations:ro
+    command: ["-path", "/migrations", "-database", "postgres://postgres:postgres@postgres:5432/taskservice?sslmode=disable", up]
+    depends_on:
+      postgres:
+        condition: service_healthy
   app:
     build:
       context: .

@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -31,6 +32,7 @@ func (s *Service) Create(ctx context.Context, input CreateInput) (*taskdomain.Ta
 		Title:       normalized.Title,
 		Description: normalized.Description,
 		Status:      normalized.Status,
+		Schedule:    normalized.Periodicity,
 	}
 	now := s.now()
 	model.CreatedAt = now
@@ -68,6 +70,7 @@ func (s *Service) Update(ctx context.Context, id int64, input UpdateInput) (*tas
 		Description: normalized.Description,
 		Status:      normalized.Status,
 		UpdatedAt:   s.now(),
+		Schedule:    normalized.Periodicity,
 	}
 
 	updated, err := s.repo.Update(ctx, model)
@@ -90,6 +93,14 @@ func (s *Service) List(ctx context.Context) ([]taskdomain.Task, error) {
 	return s.repo.List(ctx)
 }
 
+func (s *Service) GetTemplates(ctx context.Context) ([]taskdomain.Task, error) {
+	return s.repo.GetTemplates(ctx)
+}
+
+func (s *Service) UpdateLastCreatedAt(ctx context.Context, taskId int64, updatedTime time.Time) error {
+	return s.repo.UpdateLastCreatedAt(ctx, taskId, updatedTime)
+}
+
 func validateCreateInput(input CreateInput) (CreateInput, error) {
 	input.Title = strings.TrimSpace(input.Title)
 	input.Description = strings.TrimSpace(input.Description)
@@ -104,6 +115,10 @@ func validateCreateInput(input CreateInput) (CreateInput, error) {
 
 	if !input.Status.Valid() {
 		return CreateInput{}, fmt.Errorf("%w: invalid status", ErrInvalidInput)
+	}
+
+	if err := validatePeriodicity(input.Periodicity); err != nil {
+		return CreateInput{}, fmt.Errorf("%w: %s", ErrInvalidInput, err)
 	}
 
 	return input, nil
@@ -121,5 +136,24 @@ func validateUpdateInput(input UpdateInput) (UpdateInput, error) {
 		return UpdateInput{}, fmt.Errorf("%w: invalid status", ErrInvalidInput)
 	}
 
+	if err := validatePeriodicity(input.Periodicity); err != nil {
+		return UpdateInput{}, fmt.Errorf("%w: %s", ErrInvalidInput, err)
+	}
 	return input, nil
+}
+
+func validatePeriodicity(p *taskdomain.Periodicity) error {
+	if p == nil {
+		return nil
+	}
+
+	if p.EvenOdd != nil {
+		*p.EvenOdd = strings.ToLower(*p.EvenOdd)
+	}
+
+	if !p.Type.Valid() {
+		return errors.New("invalid periodicity type")
+	}
+
+	return p.Validate()
 }

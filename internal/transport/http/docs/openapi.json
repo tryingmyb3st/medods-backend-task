@@ -159,16 +159,19 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": "Prepare release"
+            "example": "Daily patient checkup"
           },
           "description": {
             "type": "string",
-            "example": "Collect release notes and check migrations"
+            "example": "Check all patients in ward 3"
           },
           "status": {
             "type": "string",
             "enum": ["new", "in_progress", "done"],
             "example": "new"
+          },
+          "periodicity": {
+            "$ref": "#/components/schemas/Periodicity"
           }
         }
       },
@@ -178,16 +181,19 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": "Prepare release"
+            "example": "Daily patient checkup"
           },
           "description": {
             "type": "string",
-            "example": "Collect release notes and check migrations"
+            "example": "Check all patients in ward 3"
           },
           "status": {
             "type": "string",
             "enum": ["new", "in_progress", "done"],
             "example": "in_progress"
+          },
+          "periodicity": {
+            "$ref": "#/components/schemas/Periodicity"
           }
         }
       },
@@ -195,25 +201,68 @@
         "type": "object",
         "properties": {
           "id": { "type": "integer", "format": "int64", "example": 1 },
-          "title": { "type": "string", "example": "Prepare release" },
+          "title": { "type": "string", "example": "Daily patient checkup" },
           "description": {
             "type": "string",
-            "example": "Collect release notes and check migrations"
+            "example": "Check all patients in ward 3"
           },
           "status": {
             "type": "string",
             "enum": ["new", "in_progress", "done"],
             "example": "new"
           },
+          "periodicity": {
+            "$ref": "#/components/schemas/Periodicity"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "example": "2026-03-24T00:00:00Z"
+            "example": "2026-04-15T00:00:00Z"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "example": "2026-03-24T00:00:00Z"
+            "example": "2026-04-15T00:00:00Z"
+          }
+        }
+      },
+      "Periodicity": {
+        "type": "object",
+        "required": ["period_type"],
+        "properties": {
+          "period_type": {
+            "type": "string",
+            "enum": ["daily", "monthly", "custom", "even_odd"],
+            "example": "daily",
+            "description": "Type of recurrence schedule"
+          },
+          "days_interval": {
+            "type": "integer",
+            "description": "For 'daily' type: create task every N days",
+            "example": 1,
+            "minimum": 1
+          },
+          "day_of_month": {
+            "type": "integer",
+            "description": "For 'monthly' type: day of month (1-30)",
+            "example": 15,
+            "minimum": 1,
+            "maximum": 30
+          },
+          "custom_dates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-04-15"
+            },
+            "description": "For 'custom' type: specific dates for task creation"
+          },
+          "even_odd": {
+            "type": "string",
+            "enum": ["even", "odd"],
+            "description": "For 'even_odd' type: create on even or odd days of month",
+            "example": "even"
           }
         }
       },

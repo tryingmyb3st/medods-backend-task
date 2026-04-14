@@ -27,10 +27,13 @@ func (h *TaskHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	inputPeriod := req.Periodicity.ToDomain()
+
 	created, err := h.usecase.Create(r.Context(), taskusecase.CreateInput{
 		Title:       req.Title,
 		Description: req.Description,
 		Status:      req.Status,
+		Periodicity: inputPeriod,
 	})
 	if err != nil {
 		writeUsecaseError(w, err)
@@ -69,10 +72,13 @@ func (h *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	inputPeriod := req.Periodicity.ToDomain()
+
 	updated, err := h.usecase.Update(r.Context(), id, taskusecase.UpdateInput{
 		Title:       req.Title,
 		Description: req.Description,
 		Status:      req.Status,
+		Periodicity: inputPeriod,
 	})
 	if err != nil {
 		writeUsecaseError(w, err)
