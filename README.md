@@ -115,12 +115,7 @@ docker compose down -v && docker compose up --build
 
 ### 6. Нечувствительность к регистру для `even_odd`
 
-Значение `even_odd` приводится к нижнему регистру на уровне usecase:
-
-```json
-"even_odd": "Even" → "even"
-"even_odd": "ODD"  → "odd"
-```
+Значение `even_odd` приводится к нижнему регистру на уровне usecase
 
 ---
 
